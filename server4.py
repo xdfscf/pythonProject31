@@ -13,8 +13,27 @@ from paramiko import SFTPServer, SFTPHandle
 
 logging.basicConfig()
 logger = logging.getLogger()
-
+import six
 from paramiko.sftp_attr import SFTPAttributes
+
+
+def generate_keys(path="./"):
+    private_key_file = './'
+    public_key_file = './'
+
+    key = paramiko.RSAKey.generate(bits=2048)
+
+    privateString = six.StringIO()
+    key.write_private_key(privateString)
+
+    with open(private_key_file, 'wb') as f:
+        f.write(privateString.getvalue().encode())
+
+    privateString.close()
+
+    with open(public_key_file, 'wb') as f:
+        f.write(key.get_base64().encode())
+
 
 private_key = paramiko.RSAKey(filename='./private_key.pem')
 
