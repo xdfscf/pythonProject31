@@ -2,6 +2,7 @@ import os, time
 import tempfile
 import paramiko
 import datetime
+from key_generator import get_private_key, generate_keys
 
 __version__ = "0.0.2"
 
@@ -144,6 +145,11 @@ username= 'xdfscf'
 password= '13579qetuo'
 
 
+private_key_file="client_private_key.pem"
+public_key_file="client_public_key.pem"
+if not os.path.exists(private_key_file):
+    generate_keys(private_key_file="client_private_key.pem", public_key_file="client_public_key.pem")
+private_key=get_private_key("client_private_key.pem")
 
 while True:
     user_input = input("Please enter instruction: ")

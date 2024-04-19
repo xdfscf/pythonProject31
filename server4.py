@@ -6,7 +6,7 @@ import subprocess
 import paramiko
 import os
 import time
-
+from key_generator import get_private_key, generate_keys
 from paramiko.sftp import SFTP_OK
 
 from paramiko import SFTPServer, SFTPHandle
@@ -17,25 +17,6 @@ import six
 from paramiko.sftp_attr import SFTPAttributes
 
 
-def generate_keys(path="./"):
-    private_key_file = './'
-    public_key_file = './'
-
-    key = paramiko.RSAKey.generate(bits=2048)
-
-    privateString = six.StringIO()
-    key.write_private_key(privateString)
-
-    with open(private_key_file, 'wb') as f:
-        f.write(privateString.getvalue().encode())
-
-    privateString.close()
-
-    with open(public_key_file, 'wb') as f:
-        f.write(key.get_base64().encode())
-
-
-private_key = paramiko.RSAKey(filename='./private_key.pem')
 
 
 class Server(paramiko.ServerInterface):
@@ -242,6 +223,11 @@ class StubSFTPServer(paramiko.SFTPServerInterface):
                 symlink = '<error>'
         return symlink
 
+private_key_file="private_key.pem"
+public_key_file="public_key.pem"
+if not os.path.exists(private_key_file):
+    generate_keys(private_key_file="private_key.pem", public_key_file="public_key.pem")
+private_key=get_private_key()
 
 while True:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
