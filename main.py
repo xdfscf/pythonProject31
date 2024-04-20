@@ -140,35 +140,41 @@ class Connection(object):
             self._transport.close()
             self._tranport_live = False
 
+
 hostname = '192.168.1.3'
 username= 'xdfscf'
 password= '13579qetuo'
 
+if __name__ == "__main__":
 
-private_key_file="client_private_key.pem"
-public_key_file="client_public_key.pem"
-if not os.path.exists(private_key_file):
-    generate_keys(private_key_file="client_private_key.pem", public_key_file="client_public_key.pem")
-private_key=get_private_key("client_private_key.pem")
 
-while True:
-    user_input = input("Please enter instruction: ")
+    private_key_file="client_private_key.pem"
+    public_key_file="client_public_key.pem"
+    if not os.path.exists(private_key_file):
+        generate_keys(private_key_file="client_private_key.pem", public_key_file="client_public_key.pem")
+    private_key=get_private_key("client_private_key.pem")
 
-    if user_input.startswith("execute"):
-        ftp = Connection(host=hostname, port=80, password='13579qetuo', username=username)
-        instruct=user_input.replace("execute ", "")
-        stdout, stderr = ftp.execute(instruct)
-        print(stdout)
-        ftp.close()
-    else:
-        ftp = Connection(host=hostname, port=80, password='13579qetuo', username=username)
-        method_name=user_input.split()[0]
-        args=user_input.split()[1:]
-        if hasattr(ftp, method_name):
-            method = getattr(ftp, method_name)
-            stdout=method(*args)
+    while True:
+        user_input = input("Please enter instruction: ")
+
+        if user_input.startswith("execute"):
+            ftp = Connection(host=hostname, port=80, password=None, username=username)
+            instruct=user_input.replace("execute ", "")
+            stdout, stderr = ftp.execute(instruct)
             print(stdout)
+            ftp.close()
+        elif user_input=="break":
+            break
+
         else:
-            print("No such method")
-        ftp.close()
+            ftp = Connection(host=hostname, port=80, password=None, username=username)
+            method_name=user_input.split()[0]
+            args=user_input.split()[1:]
+            if hasattr(ftp, method_name):
+                method = getattr(ftp, method_name)
+                stdout=method(*args)
+                print(stdout)
+            else:
+                print("No such method")
+            ftp.close()
 

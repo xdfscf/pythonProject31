@@ -229,24 +229,25 @@ if not os.path.exists(private_key_file):
     generate_keys(private_key_file="private_key.pem", public_key_file="public_key.pem")
 private_key=get_private_key()
 
-while True:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', 80))
+if __name__ == "__main__":
+    while True:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(('', 80))
 
-    sock.listen(30)
-    client, addr = sock.accept()
+        sock.listen(30)
+        client, addr = sock.accept()
 
-    transport = paramiko.Transport(client)
-    transport.set_gss_host(socket.getfqdn(""))
-    transport.load_server_moduli()
-    transport.add_server_key(private_key)
-    transport.set_subsystem_handler(
-        'sftp', paramiko.SFTPServer, sftp_si=StubSFTPServer)
-    server = Server()
-    transport.start_server(server=server)
-    server.event.wait(10)
-    if server.event.is_set():
-        server.event.clear()
-    sock.close()
-    transport.close()
+        transport = paramiko.Transport(client)
+        transport.set_gss_host(socket.getfqdn(""))
+        transport.load_server_moduli()
+        transport.add_server_key(private_key)
+        transport.set_subsystem_handler(
+            'sftp', paramiko.SFTPServer, sftp_si=StubSFTPServer)
+        server = Server()
+        transport.start_server(server=server)
+        server.event.wait(10)
+        if server.event.is_set():
+            server.event.clear()
+        sock.close()
+        transport.close()
